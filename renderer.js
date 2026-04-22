@@ -8,14 +8,33 @@ const txtUser = document.getElementById('txt-user');
 const txtPass = document.getElementById('txt-pass');
 const btnSaveCreds = document.getElementById('btn-save-creds');
 
+const fs = require('fs');
+const os = require('os');
+const credsPath = path.join(os.homedir(), 'arco-wms-creds.json');
+
 // Carrega os dados salvos do localStorage
-if (localStorage.getItem('wms_user')) txtUser.value = localStorage.getItem('wms_user');
-if (localStorage.getItem('wms_pass')) txtPass.value = localStorage.getItem('wms_pass');
+if (fs.existsSync(credsPath)) {
+    try {
+        const creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
+        if (creds.user) txtUser.value = creds.user;
+        if (creds.pass) txtPass.value = creds.pass;
+    } catch (e) {}
+} else {
+    // Fallback/Migração
+    if (localStorage.getItem('wms_user')) txtUser.value = localStorage.getItem('wms_user');
+    if (localStorage.getItem('wms_pass')) txtPass.value = localStorage.getItem('wms_pass');
+}
 
 // Salva ao clicar no botão
 btnSaveCreds.addEventListener('click', () => {
     const user = txtUser.value.trim();
     const pass = txtPass.value.trim();
+    
+    try {
+        fs.writeFileSync(credsPath, JSON.stringify({ user, pass }));
+    } catch(e) {
+        console.error("Erro ao salvar credenciais:", e);
+    }
     
     localStorage.setItem('wms_user', user);
     localStorage.setItem('wms_pass', pass);
