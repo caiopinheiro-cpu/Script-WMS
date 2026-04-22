@@ -439,54 +439,6 @@
             color: rgba(255,255,255,0.5);
             line-height: 1.5;
         }
-
-        /* Footer Padronizado */
-        .arco-footer {
-            position: fixed;
-            bottom: 16px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            z-index: 50;
-            pointer-events: none;
-        }
-
-        .arco-footer p {
-            margin: 0;
-        }
-
-        .arco-footer-link {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: color 0.2s ease;
-            pointer-events: auto;
-        }
-
-        .arco-footer-link:hover {
-            color: #ffffff;
-            text-decoration: underline;
-        }
-
-        .arco-linkedin-icon {
-            height: 14px;
-            width: auto;
-            vertical-align: middle;
-            filter: grayscale(100%) brightness(200%);
-            transition: filter 0.2s ease;
-        }
-
-        .arco-footer-link:hover .arco-linkedin-icon {
-            filter: none;
-        }
     </style>
 </head>
 <body>
@@ -590,17 +542,6 @@
     </div>
 
     <div class="version-badge" id="version-badge">v0.0.0</div>
-
-    <!-- Footer Padronizado -->
-    <footer class="arco-footer">
-       <p>© 2026 Arco Educação. Todos os direitos reservados.</p>
-       <p>Desenvolvido por 
-          <a href="https://www.linkedin.com/in/caio-pinheiro-205206219/" target="_blank" rel="noopener noreferrer" class="arco-footer-link">
-             <img src="https://static.vecteezy.com/system/resources/thumbnails/023/986/970/small/linkedin-logo-linkedin-logo-transparent-linkedin-icon-transparent-free-free-png.png" class="arco-linkedin-icon" alt="LinkedIn">
-             Caio Pinheiro
-          </a>
-       </p>
-    </footer>
 
     <script>
         const { ipcRenderer } = require('electron');
