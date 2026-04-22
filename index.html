@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Arco WMS Automator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --azul-marinho: #051A3C;
+            --vermelho-arco: #EF4438;
+            --vermelho-arco-hover: #d63d32;
+            --azul-arco: #4281CB;
+            --azul-arco-hover: #3b74b6;
+            --branco: #FFFFFF;
+            --preto: #000000;
+            --bg-main: #f4f7f6;
+            --bg-panel: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: rgba(248, 250, 252, 0.7);
+            --input-focus: rgba(186, 230, 253, 0.5);
+            --log-bg: #0f172a;
+            --log-text: #38bdf8;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Container Principal */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        /* Painel Esquerdo */
+        #left-panel {
+            width: 440px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: 10;
+        }
+
+        /* Painel Direito (Webview) */
+        #right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 10;
+        }
+
+        #right-panel::before {
+            content: "VISUALIZADOR WMS";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-muted);
+            font-size: 28px;
+            font-weight: 800;
+            opacity: 0.15;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--azul-marinho) 0%, #1e3a8a 100%);
+            color: var(--branco);
+            padding: 28px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: scale(0.5);
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            margin: 8px 0 0 0;
+            font-size: 13px;
+            color: #bfdbfe;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Controles */
+        .controls {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .controls::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .controls::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--azul-marinho);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select,
+        textarea,
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            font-weight: 500;
+        }
+
+        select:focus,
+        textarea:focus,
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--azul-arco);
+            box-shadow: 0 0 0 4px var(--input-focus);
+            background-color: #ffffff;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            line-height: 1.6;
+        }
+
+        .instrucoes {
+            background: linear-gradient(to right, rgba(239, 246, 255, 0.8), rgba(219, 234, 254, 0.4));
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            border-left: 5px solid var(--azul-arco);
+            font-size: 13px;
+            color: #1e3a8a;
+            white-space: pre-line;
+            line-height: 1.6;
+            box-shadow: var(--shadow-sm);
+            font-weight: 500;
+        }
+
+        /* Botões */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 4px;
+        }
+
+        .btn-full {
+            grid-column: span 2;
+        }
+
+        button {
+            padding: 14px 18px;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.5px;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:disabled {
+            background: #e2e8f0 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #btn-abrir {
+            background: linear-gradient(135deg, var(--azul-arco) 0%, #2563eb 100%);
+        }
+
+        #btn-iniciar {
+            background: linear-gradient(135deg, var(--vermelho-arco) 0%, #dc2626 100%);
+        }
+
+        #btn-parar {
+            background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+        }
+
+        /* Progresso */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        progress {
+            width: 100%;
+            height: 14px;
+            border-radius: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: rgba(226, 232, 240, 0.8);
+            border-radius: 8px;
+        }
+
+        progress::-webkit-progress-value {
+            background: linear-gradient(90deg, #3b82f6 0%, #2dd4bf 100%);
+            border-radius: 8px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Log Box */
+        .log-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 180px;
+            margin-top: 4px;
+        }
+
+        #log-box {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 13px;
+            color: var(--log-text);
+            overflow-y: auto;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+            backdrop-filter: blur(10px);
+        }
+
+        #log-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #log-box::-webkit-scrollbar-thumb {
+            background-color: #475569;
+            border-radius: 10px;
+        }
+
+        #log-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #log-box div {
+            margin-bottom: 6px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        #log-box div:last-child {
+            border-bottom: none;
+        }
+
+        /* Webview */
+        webview {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+            border-radius: calc(var(--radius-xl) - 2px);
+            /* Para encaixar dentro da borda sem vazar */
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <!-- Painel Esquerdo -->
+        <div id="left-panel">
+            <div class="header">
+                <div
+                    style="background: rgba(255, 255, 255, 0.95); padding: 8px 16px; border-radius: 12px; display: inline-block; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                    <img src="https://companieslogo.com/img/orig/ARCE_BIG-78923d29.png?t=1720244490" alt="Arco Educação"
+                        style="height: 28px; display: block;">
+                </div>
+                <h1><i class="fa-solid fa-robot"></i> ARCO WMS AUTOMATOR</h1>
+            </div>
+
+            <div class="controls">
+                <div class="control-group"
+                    style="display: flex; flex-direction: row; gap: 10px; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label for="txt-user"><i class="fa-solid fa-user"></i> Usuário:</label>
+                        <input type="text" id="txt-user" placeholder="Usuário" />
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="txt-pass"><i class="fa-solid fa-lock"></i> Senha:</label>
+                        <input type="password" id="txt-pass" placeholder="Senha" />
+                    </div>
+                    <button id="btn-save-creds" title="Salvar Credenciais"
+                        style="background: rgba(66, 129, 203, 0.15); color: var(--azul-arco); box-shadow: none; padding: 12px 14px; border: 1px solid rgba(66, 129, 203, 0.2); border-radius: var(--radius-lg); height: 46px;">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <label for="combo-modo"><i class="fa-solid fa-gears"></i> Robô / Operação:</label>
+                    <select id="combo-modo">
+                        <option value="Fracionamento">1. Fracionamento (Split)</option>
+                        <option value="Recebimento">2. Recebimento (Conferência)</option>
+                        <option value="Cancelamento">3. Cancelamento Fixo</option>
+                        <option value="Movimentar">4. Movimentar LPN</option>
+                        <option value="Retorno">5. Retorno do Ativo</option>
+                    </select>
+                </div>
+
+                <div id="lbl-instr" class="instrucoes"></div>
+
+                <div class="control-group">
+                    <label for="txt-input"><i class="fa-solid fa-table"></i> Dados (Cole do Excel):</label>
+                    <textarea id="txt-input" placeholder="Cole os dados aqui..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button id="btn-abrir" class="btn-full"><i class="fa-solid fa-globe"></i> ABRIR WMS</button>
+                    <button id="btn-iniciar" disabled><i class="fa-solid fa-play"></i> EXECUTAR ROBÔ</button>
+                    <button id="btn-parar" disabled><i class="fa-solid fa-stop"></i> PARAR</button>
+                </div>
+
+                <div class="progress-container">
+                    <label><i class="fa-solid fa-tasks"></i> Progresso:</label>
+                    <progress id="progress-bar" value="0" max="100"></progress>
+                </div>
+
+                <div class="log-container">
+                    <label><i class="fa-solid fa-terminal"></i> Terminal de Log:</label>
+                    <div id="log-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel Direito -->
+        <div id="right-panel">
+            <webview id="wms-view" src="about:blank"></webview>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>

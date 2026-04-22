@@ -1,0 +1,33 @@
+{
+  "name": "arco-wms-automator",
+  "version": "1.0.1",
+  "description": "Logistica Centralizada em Um So Lugar",
+  "author": "Arco",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.arco.wmsautomator",
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
+    "electron": "^41.2.2",
+    "electron-builder": "^26.8.1"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.3",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
+  }
+}

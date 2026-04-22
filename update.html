@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Atualização Disponível — Arco WMS Automator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #051A3C 0%, #0f2d5e 40%, #1a1a4e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Partículas */
+        .particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(66, 129, 203, 0.12);
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        /* Card principal */
+        .update-card {
+            position: relative;
+            z-index: 10;
+            width: 520px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 32px 80px rgba(0,0,0,0.6),
+                0 0 60px rgba(66, 129, 203, 0.12);
+            animation: cardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Header do card */
+        .card-header {
+            background: linear-gradient(135deg, #EF4438 0%, #c0392b 100%);
+            padding: 28px 32px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -20%;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            pointer-events: none;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -10%;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            pointer-events: none;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header-text h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        .header-text p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        /* Badges de versão */
+        .version-badges {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .version-tag {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .version-tag .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .version-tag .value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .version-tag .value.new {
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .version-arrow {
+            font-size: 18px;
+            color: rgba(255,255,255,0.5);
+            margin: 16px 4px 0;
+        }
+
+        /* Corpo do card */
+        .card-body {
+            padding: 28px 32px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Info row */
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+        }
+
+        .info-row .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .info-row .icon.blue { background: rgba(66,129,203,0.15); color: #4281CB; }
+        .info-row .icon.yellow { background: rgba(234,179,8,0.15); color: #eab308; }
+
+        .info-row .content {
+            flex: 1;
+        }
+
+        .info-row .content strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 4px;
+        }
+
+        .info-row .content span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+
+        /* Progresso */
+        .progress-section {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-section.visible {
+            display: flex;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-label span {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .progress-label .progress-pct {
+            font-size: 13px;
+            font-weight: 700;
+            color: #4281CB;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4281CB, #38bdf8);
+            border-radius: 8px;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px rgba(66,129,203,0.5);
+        }
+
+        .progress-file {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Botões */
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.3px;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.9);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4281CB 0%, #2563eb 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(66,129,203,0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            box-shadow: 0 8px 28px rgba(66,129,203,0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Estado de conclusão */
+        .done-banner {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 14px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .done-banner.visible {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .done-banner .done-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(34, 197, 94, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #22c55e;
+            flex-shrink: 0;
+        }
+
+        .done-banner .done-text strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .done-banner .done-text span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .logo-small {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.95);
+            padding: 8px 14px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .logo-small img {
+            height: 24px;
+            display: block;
+        }
+
+        .version-badge {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Error state */
+        .error-banner {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            background: rgba(239, 68, 56, 0.1);
+            border: 1px solid rgba(239, 68, 56, 0.25);
+            border-radius: 14px;
+        }
+
+        .error-banner.visible { display: flex; }
+
+        .error-banner .icon {
+            font-size: 20px;
+            color: #EF4438;
+            flex-shrink: 0;
+        }
+
+        .error-banner span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <!-- Logo -->
+    <div class="logo-small">
+        <img src="https://companieslogo.com/img/orig/ARCE_BIG-78923d29.png?t=1720244490" alt="Arco Educação">
+    </div>
+
+    <!-- Card -->
+    <div class="update-card">
+        <!-- Header -->
+        <div class="card-header">
+            <div class="header-top">
+                <div class="header-icon">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                </div>
+                <div class="header-text">
+                    <h2>Atualização Disponível</h2>
+                    <p>Uma nova versão do aplicativo está pronta.</p>
+                </div>
+            </div>
+
+            <div class="version-badges">
+                <div class="version-tag">
+                    <span class="label">Versão atual</span>
+                    <span class="value" id="local-version">—</span>
+                </div>
+                <div class="version-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+                <div class="version-tag">
+                    <span class="label">Nova versão</span>
+                    <span class="value new" id="remote-version">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Corpo -->
+        <div class="card-body">
+
+            <!-- Infos -->
+            <div class="info-row">
+                <div class="icon blue">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <div class="content">
+                    <strong>O que será atualizado?</strong>
+                    <span>Os arquivos de interface e automação serão substituídos pela versão mais recente do repositório GitHub.</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="icon yellow">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="content">
+                    <strong>Importante</strong>
+                    <span>O aplicativo será reiniciado automaticamente após a conclusão da atualização.</span>
+                </div>
+            </div>
+
+            <!-- Progresso (oculto até clicar em Atualizar) -->
+            <div class="progress-section" id="progress-section">
+                <div class="progress-label">
+                    <span id="progress-file-label">Baixando arquivos...</span>
+                    <span class="progress-pct" id="progress-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-file" id="progress-detail"></div>
+            </div>
+
+            <!-- Banner de conclusão (oculto inicialmente) -->
+            <div class="done-banner" id="done-banner">
+                <div class="done-icon"><i class="fa-solid fa-check"></i></div>
+                <div class="done-text">
+                    <strong>Atualização concluída!</strong>
+                    <span>O aplicativo será reiniciado em instantes...</span>
+                </div>
+            </div>
+
+            <!-- Banner de erro (oculto inicialmente) -->
+            <div class="error-banner" id="error-banner">
+                <div class="icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <span id="error-msg">Erro ao baixar a atualização.</span>
+            </div>
+
+            <!-- Botões -->
+            <div class="btn-row" id="btn-row">
+                <button class="btn btn-secondary" id="btn-skip">
+                    <i class="fa-solid fa-forward"></i> Pular por agora
+                </button>
+                <button class="btn btn-primary" id="btn-update">
+                    <i class="fa-solid fa-download"></i> Atualizar agora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="version-badge" id="version-badge">v0.0.0</div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // ── Partículas ──────────────────────────────────────────────────────
+        const particlesEl = document.getElementById('particles');
+        for (let i = 0; i < 16; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 60 + 10;
+            p.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                left: ${Math.random() * 100}%;
+                animation-duration: ${Math.random() * 12 + 8}s;
+                animation-delay: ${Math.random() * 8}s;
+            `;
+            particlesEl.appendChild(p);
+        }
+
+        // ── Elementos ───────────────────────────────────────────────────────
+        const localVersionEl  = document.getElementById('local-version');
+        const remoteVersionEl = document.getElementById('remote-version');
+        const versionBadge    = document.getElementById('version-badge');
+        const progressSection = document.getElementById('progress-section');
+        const progressFill    = document.getElementById('progress-fill');
+        const progressPct     = document.getElementById('progress-pct');
+        const progressDetail  = document.getElementById('progress-detail');
+        const progressFileLabel = document.getElementById('progress-file-label');
+        const doneBanner      = document.getElementById('done-banner');
+        const errorBanner     = document.getElementById('error-banner');
+        const errorMsg        = document.getElementById('error-msg');
+        const btnRow          = document.getElementById('btn-row');
+        const btnUpdate       = document.getElementById('btn-update');
+        const btnSkip         = document.getElementById('btn-skip');
+
+        // ── Recebe dados de versão do main process ──────────────────────────
+        ipcRenderer.on('update-info', (event, data) => {
+            localVersionEl.textContent  = `v${data.localVersion}`;
+            remoteVersionEl.textContent = `v${data.remoteVersion}`;
+            versionBadge.textContent    = `v${data.localVersion}`;
+        });
+
+        // ── Progresso de download ───────────────────────────────────────────
+        ipcRenderer.on('update-progress', (event, data) => {
+            const { file, current, total } = data;
+            const pct = Math.round((current / total) * 100);
+
+            progressSection.classList.add('visible');
+            progressFill.style.width   = pct + '%';
+            progressPct.textContent    = pct + '%';
+            progressFileLabel.textContent = `Baixando arquivo ${current} de ${total}...`;
+            progressDetail.textContent = `📄 ${file}`;
+        });
+
+        // ── Conclusão ───────────────────────────────────────────────────────
+        ipcRenderer.on('update-done', () => {
+            progressFill.style.width = '100%';
+            progressPct.textContent  = '100%';
+            btnRow.style.display     = 'none';
+            doneBanner.classList.add('visible');
+        });
+
+        // ── Erro ────────────────────────────────────────────────────────────
+        ipcRenderer.on('update-error', (event, msg) => {
+            progressSection.classList.remove('visible');
+            errorMsg.textContent = msg;
+            errorBanner.classList.add('visible');
+            btnUpdate.disabled = false;
+            btnSkip.disabled   = false;
+        });
+
+        // ── Ações dos botões ────────────────────────────────────────────────
+        btnUpdate.addEventListener('click', () => {
+            btnUpdate.disabled = true;
+            btnSkip.disabled   = true;
+            btnUpdate.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...';
+            ipcRenderer.send('start-update');
+        });
+
+        btnSkip.addEventListener('click', () => {
+            ipcRenderer.send('skip-update');
+        });
+    </script>
+</body>
+</html>

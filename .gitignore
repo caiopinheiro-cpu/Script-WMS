@@ -1,0 +1,16 @@
+# Arquivo de configuração local com o token (NUNCA enviar ao repositório)
+config.json
+
+# Dependências Node
+node_modules/
+
+# Build outputs
+dist/
+release-builds/
+
+# Script de upload (uso interno)
+push_to_github.ps1
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Arco WMS Automator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #051A3C 0%, #0f2d5e 40%, #1a1a4e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Partículas de fundo */
+        .particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(66, 129, 203, 0.15);
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        /* Card Central */
+        .card {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            text-align: center;
+            animation: cardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Logo Badge */
+        .logo-wrapper {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 20px;
+            padding: 16px 28px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.1),
+                0 20px 60px rgba(0,0,0,0.5),
+                0 0 80px rgba(66, 129, 203, 0.2);
+            margin-bottom: 36px;
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 20px 60px rgba(0,0,0,0.5), 0 0 80px rgba(66,129,203,0.2); }
+            50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 20px 60px rgba(0,0,0,0.5), 0 0 120px rgba(66,129,203,0.5); }
+        }
+
+        .logo-wrapper img {
+            height: 40px;
+            display: block;
+        }
+
+        /* Título */
+        .app-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 20px rgba(66, 129, 203, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .app-title span {
+            color: #4281CB;
+        }
+
+        .app-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 60px;
+        }
+
+        /* Status Container */
+        .status-container {
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Spinner Animado */
+        .spinner-wrapper {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 4px;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px solid transparent;
+        }
+
+        .spinner-ring:nth-child(1) {
+            border-top-color: #4281CB;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            inset: 8px;
+            border-top-color: #EF4438;
+            border-right-color: rgba(239, 68, 56, 0.3);
+            animation: spin 1.5s linear infinite reverse;
+        }
+
+        .spinner-ring:nth-child(3) {
+            inset: 16px;
+            border-top-color: rgba(255,255,255,0.5);
+            animation: spin 2s linear infinite;
+        }
+
+        .spinner-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Texto de Status */
+        .status-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            min-height: 24px;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-subtext {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            min-height: 18px;
+        }
+
+        /* Barra de Progresso */
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4281CB, #38bdf8, #4281CB);
+            background-size: 200% 100%;
+            border-radius: 4px;
+            transition: width 0.4s ease;
+            animation: shimmer 2s linear infinite;
+        }
+
+        .progress-bar-indeterminate {
+            position: absolute;
+            top: 0;
+            left: -60%;
+            height: 100%;
+            width: 60%;
+            background: linear-gradient(90deg, transparent, rgba(66,129,203,0.8), transparent);
+            border-radius: 4px;
+            animation: indeterminate 1.5s ease-in-out infinite;
+        }
+
+        @keyframes indeterminate {
+            0% { left: -60%; }
+            100% { left: 110%; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Versão */
+        .version-badge {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Ícone de sucesso / erro */
+        .status-icon {
+            display: none;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            animation: iconIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        .status-icon.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-icon.error {
+            background: rgba(239, 68, 56, 0.15);
+            color: #EF4438;
+            border: 2px solid rgba(239, 68, 56, 0.3);
+        }
+
+        @keyframes iconIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .hidden { display: none !important; }
+        .flex { display: flex !important; }
+    </style>
+</head>
+<body>
+    <!-- Partículas -->
+    <div class="particles" id="particles"></div>
+
+    <div class="card">
+        <!-- Logo -->
+        <div class="logo-wrapper">
+            <img src="https://companieslogo.com/img/orig/ARCE_BIG-78923d29.png?t=1720244490" alt="Arco Educação">
+        </div>
+
+        <!-- Título -->
+        <h1 class="app-title">ARCO <span>WMS</span> AUTOMATOR</h1>
+        <p class="app-subtitle">Logística Centralizada em Um Só Lugar</p>
+
+        <!-- Status -->
+        <div class="status-container">
+            <!-- Spinner -->
+            <div class="spinner-wrapper" id="spinner-wrapper">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+            </div>
+
+            <!-- Ícone de status (sucesso/erro) - oculto por padrão -->
+            <div class="status-icon" id="status-icon"></div>
+
+            <p class="status-text" id="status-text">Verificando atualizações...</p>
+            <p class="status-subtext" id="status-subtext">Conectando ao servidor</p>
+
+            <!-- Barra de Progresso -->
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+                <div class="progress-bar-indeterminate" id="progress-indeterminate"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="version-badge" id="version-badge">v0.0.0</div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // ── Partículas ──────────────────────────────────────────────────────
+        const particlesEl = document.getElementById('particles');
+        for (let i = 0; i < 18; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 60 + 10;
+            p.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                left: ${Math.random() * 100}%;
+                animation-duration: ${Math.random() * 12 + 8}s;
+                animation-delay: ${Math.random() * 8}s;
+            `;
+            particlesEl.appendChild(p);
+        }
+
+        // ── Elementos ───────────────────────────────────────────────────────
+        const statusText = document.getElementById('status-text');
+        const statusSubtext = document.getElementById('status-subtext');
+        const progressFill = document.getElementById('progress-fill');
+        const progressIndeterminate = document.getElementById('progress-indeterminate');
+        const spinnerWrapper = document.getElementById('spinner-wrapper');
+        const statusIcon = document.getElementById('status-icon');
+        const versionBadge = document.getElementById('version-badge');
+
+        // ── Helpers ─────────────────────────────────────────────────────────
+        function setProgress(percent) {
+            if (percent >= 0) {
+                progressIndeterminate.style.display = 'none';
+                progressFill.style.width = percent + '%';
+            } else {
+                progressIndeterminate.style.display = 'block';
+                progressFill.style.width = '0%';
+            }
+        }
+
+        function showIcon(type, iconClass) {
+            spinnerWrapper.classList.add('hidden');
+            statusIcon.className = `status-icon ${type} flex`;
+            statusIcon.innerHTML = `<i class="${iconClass}"></i>`;
+        }
+
+        // ── Eventos do Main Process ──────────────────────────────────────────
+        ipcRenderer.on('splash-status', (event, data) => {
+            const { type, text, subtext, progress, version } = data;
+
+            if (text) statusText.textContent = text;
+            if (subtext !== undefined) statusSubtext.textContent = subtext;
+            if (progress !== undefined) setProgress(progress);
+            if (version) versionBadge.textContent = `v${version}`;
+
+            if (type === 'checking') {
+                setProgress(-1); // indeterminate
+            } else if (type === 'success') {
+                showIcon('success', 'fa-solid fa-check');
+            } else if (type === 'error') {
+                showIcon('error', 'fa-solid fa-triangle-exclamation');
+            }
+        });
+    </script>
+</body>
+</html>
