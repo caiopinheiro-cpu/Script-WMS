@@ -1,6 +1,6 @@
 {
   "name": "arco-wms-automator",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Logistica Centralizada em Um So Lugar",
   "author": "Arco",
   "main": "main.js",
@@ -11,7 +11,8 @@
   "build": {
     "appId": "com.arco.wmsautomator",
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "asar": false
     },
     "nsis": {
       "oneClick": false,
