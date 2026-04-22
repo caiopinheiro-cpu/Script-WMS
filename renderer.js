@@ -18,7 +18,7 @@ if (fs.existsSync(credsPath)) {
         const creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
         if (creds.user) txtUser.value = creds.user;
         if (creds.pass) txtPass.value = creds.pass;
-    } catch (e) {}
+    } catch (e) { }
 } else {
     // Fallback/Migração
     if (localStorage.getItem('wms_user')) txtUser.value = localStorage.getItem('wms_user');
@@ -29,25 +29,25 @@ if (fs.existsSync(credsPath)) {
 btnSaveCreds.addEventListener('click', () => {
     const user = txtUser.value.trim();
     const pass = txtPass.value.trim();
-    
+
     try {
         fs.writeFileSync(credsPath, JSON.stringify({ user, pass }));
-    } catch(e) {
+    } catch (e) {
         console.error("Erro ao salvar credenciais:", e);
     }
-    
+
     localStorage.setItem('wms_user', user);
     localStorage.setItem('wms_pass', pass);
-    
+
     addLog("Credenciais salvas com sucesso!", "sucesso");
-    
+
     // Feedback visual no botão
     const originalIcon = btnSaveCreds.innerHTML;
     btnSaveCreds.innerHTML = '<i class="fa-solid fa-check"></i>';
     btnSaveCreds.style.background = "rgba(74, 222, 128, 0.2)";
     btnSaveCreds.style.color = "#166534";
     btnSaveCreds.style.borderColor = "rgba(74, 222, 128, 0.4)";
-    
+
     setTimeout(() => {
         btnSaveCreds.innerHTML = originalIcon;
         btnSaveCreds.style.background = "rgba(66, 129, 203, 0.15)";

@@ -23,9 +23,7 @@ const GITHUB_BRANCH = _cfg.github_branch || 'main';
 const FILES_TO_UPDATE = [
     'index.html',
     'renderer.js',
-    'preload.js',
-    'splash.html',
-    'update.html'
+    'preload.js'
 ];
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
