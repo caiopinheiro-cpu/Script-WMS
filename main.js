@@ -139,7 +139,9 @@ async function bootstrap() {
 // ─── ABRE O APP PRINCIPAL E FECHA A SPLASH ────────────────────────────────────
 async function openMainApp() {
     // Limpa o cache do WMS antes de abrir
-    await session.defaultSession.clearStorageData();
+    await session.defaultSession.clearStorageData({
+        storages: ['appcache', 'cookies', 'filesystem', 'indexdb', 'shadercache', 'websql', 'serviceworkers', 'cachestorage']
+    });
 
     createMainWindow();
 
