@@ -29,18 +29,36 @@ async function sendKeys(el, text, action = null) {
     el.value = text;
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
-    await sleep(100);
+    await sleep(200);
 
     if (action === 'ENTER') {
-        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, which: 13, code: 'Enter', bubbles: true }));
+        el.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', keyCode: 13, which: 13, code: 'Enter', bubbles: true }));
     } else if (action === 'TAB') {
-        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', keyCode: 9, bubbles: true }));
+        el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', keyCode: 9, which: 9, code: 'Tab', bubbles: true }));
+        el.dispatchEvent(new KeyboardEvent('keyup', { key: 'Tab', keyCode: 9, which: 9, code: 'Tab', bubbles: true }));
     }
     await sleep(800);
 }
 
 async function simularCtrlE() {
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'e', ctrlKey: true, bubbles: true }));
+    const el = document.activeElement || document.body || document;
+    ipcRenderer.sendToHost('webview-log', 'Acionando comando CTRL+E...');
+    
+    const eventData = { 
+        key: 'e', 
+        keyCode: 69, 
+        which: 69, 
+        code: 'KeyE', 
+        ctrlKey: true, 
+        bubbles: true,
+        cancelable: true,
+        view: window
+    };
+
+    el.dispatchEvent(new KeyboardEvent('keydown', eventData));
+    await sleep(50);
+    el.dispatchEvent(new KeyboardEvent('keyup', eventData));
 }
 
 // --- Rotinas de Automação ---
@@ -183,11 +201,11 @@ async function rotinaCargaInicial(dados) {
     // 3. Inserir Quantidade (Usa ENTER)
     let campoQtd = await waitForElement(SELECTOR_INPUT_NUMBER);
     await sendKeys(campoQtd, qtd, 'ENTER');
-    await sleep(800);
+    await sleep(1200); // Aumentado para garantir processamento
 
-    // 4. Apertar CTRL+E
+    // 4. Apertar CTRL+E para finalizar/confirmar
     await simularCtrlE();
-    await sleep(1500);
+    await sleep(2000); // Aguarda a transição de tela
 
     // 5. Inserir Posição (Usa ENTER)
     let campoPosicao = await waitForElement(SELECTOR_INPUT_BARCODE);
