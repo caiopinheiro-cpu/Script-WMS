@@ -1,6 +1,6 @@
 ﻿{
     "name":  "arco-wms-automator",
-    "version":  "1.1.4",
+    "version":  "1.1.5",
     "description":  "Logistica Centralizada em Um So Lugar",
     "author":  "Arco",
     "main":  "main.js",
