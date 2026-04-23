@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Atualização Disponível — Arco WMS Automator</title>
+    <title>Atualização Disponível — Arco WMS Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -577,14 +577,14 @@
         const btnUpdate       = document.getElementById('btn-update');
         const btnSkip         = document.getElementById('btn-skip');
 
-        // ── Recebe dados de versão do main process ──────────────────────────
+        // Controle de versão
         ipcRenderer.on('update-info', (event, data) => {
             localVersionEl.textContent  = `v${data.localVersion}`;
             remoteVersionEl.textContent = `v${data.remoteVersion}`;
             versionBadge.textContent    = `v${data.localVersion}`;
         });
 
-        // ── Progresso de download ───────────────────────────────────────────
+        // Progresso
         ipcRenderer.on('update-progress', (event, data) => {
             const { file, current, total } = data;
             const pct = Math.round((current / total) * 100);
@@ -596,7 +596,7 @@
             progressDetail.textContent = `📄 ${file}`;
         });
 
-        // ── Conclusão ───────────────────────────────────────────────────────
+        // Finalização
         ipcRenderer.on('update-done', () => {
             progressFill.style.width = '100%';
             progressPct.textContent  = '100%';
@@ -604,7 +604,7 @@
             doneBanner.classList.add('visible');
         });
 
-        // ── Erro ────────────────────────────────────────────────────────────
+        // Tratamento de erros
         ipcRenderer.on('update-error', (event, msg) => {
             progressSection.classList.remove('visible');
             errorMsg.textContent = msg;
@@ -613,7 +613,7 @@
             btnSkip.disabled   = false;
         });
 
-        // ── Ações dos botões ────────────────────────────────────────────────
+        // Ações
         btnUpdate.addEventListener('click', () => {
             btnUpdate.disabled = true;
             btnSkip.disabled   = true;

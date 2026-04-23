@@ -1,6 +1,5 @@
 const path = require('path');
 
-// Elementos da UI
 const comboModo = document.getElementById('combo-modo');
 const lblInstr = document.getElementById('lbl-instr');
 const txtInput = document.getElementById('txt-input');
@@ -12,7 +11,7 @@ const fs = require('fs');
 const os = require('os');
 const credsPath = path.join(os.homedir(), 'arco-wms-creds.json');
 
-// Carrega os dados salvos do localStorage
+// Carregar credenciais
 if (fs.existsSync(credsPath)) {
     try {
         const creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
@@ -20,12 +19,11 @@ if (fs.existsSync(credsPath)) {
         if (creds.pass) txtPass.value = creds.pass;
     } catch (e) { }
 } else {
-    // Fallback/Migração
     if (localStorage.getItem('wms_user')) txtUser.value = localStorage.getItem('wms_user');
     if (localStorage.getItem('wms_pass')) txtPass.value = localStorage.getItem('wms_pass');
 }
 
-// Salva ao clicar no botão
+// Salvar credenciais
 btnSaveCreds.addEventListener('click', () => {
     const user = txtUser.value.trim();
     const pass = txtPass.value.trim();
@@ -33,15 +31,14 @@ btnSaveCreds.addEventListener('click', () => {
     try {
         fs.writeFileSync(credsPath, JSON.stringify({ user, pass }));
     } catch (e) {
-        console.error("Erro ao salvar credenciais:", e);
+        console.error("Erro ao salvar:", e);
     }
 
     localStorage.setItem('wms_user', user);
     localStorage.setItem('wms_pass', pass);
 
-    addLog("Credenciais salvas com sucesso!", "sucesso");
+    addLog("Credenciais salvas!", "sucesso");
 
-    // Feedback visual no botão
     const originalIcon = btnSaveCreds.innerHTML;
     btnSaveCreds.innerHTML = '<i class="fa-solid fa-check"></i>';
     btnSaveCreds.style.background = "rgba(74, 222, 128, 0.2)";
@@ -64,11 +61,39 @@ const logBox = document.getElementById('log-box');
 const webview = document.getElementById('wms-view');
 webview.setAttribute('preload', 'file://' + path.join(__dirname, 'preload.js'));
 
-const WMS_URL = "https://k1.wms.ocs.oraclecloud.com/arcoed/index_pwa/vp/app/htmlrf";
+const WMS_SAE_URL = "https://k1.wms.ocs.oraclecloud.com/arcoed/index_pwa/vp/app/htmlrf";
+const WMS_SAS_URL = "https://tk1.wms.ocs.oraclecloud.com/arcoed_test/index_pwa/vp/app/htmlrf";
+let CURRENT_WMS_URL = WMS_SAE_URL;
+
+const btnWmsSae = document.getElementById('btn-wms-sae');
+const btnWmsSas = document.getElementById('btn-wms-sas');
+
+btnWmsSae.addEventListener('click', () => {
+    CURRENT_WMS_URL = WMS_SAE_URL;
+    btnWmsSae.classList.add('active');
+    btnWmsSae.style.background = 'var(--azul-arco)';
+    btnWmsSae.style.color = 'white';
+    btnWmsSas.classList.remove('active');
+    btnWmsSas.style.background = 'transparent';
+    btnWmsSas.style.color = 'var(--text-main)';
+    addLog("WMS alterado para SAE (Produção)");
+    btnAbrir.disabled = false;
+});
+
+btnWmsSas.addEventListener('click', () => {
+    CURRENT_WMS_URL = WMS_SAS_URL;
+    btnWmsSas.classList.add('active');
+    btnWmsSas.style.background = 'var(--azul-arco)';
+    btnWmsSas.style.color = 'white';
+    btnWmsSae.classList.remove('active');
+    btnWmsSae.style.background = 'transparent';
+    btnWmsSae.style.color = 'var(--text-main)';
+    addLog("WMS alterado para SAS (Teste)");
+    btnAbrir.disabled = false;
+});
 
 let isRunning = false;
 
-// Atualiza Instruções
 function atualizarInstrucoes() {
     const modo = comboModo.value;
     let texto = "";
@@ -77,12 +102,12 @@ function atualizarInstrucoes() {
     else if (modo === "Cancelamento") texto = "📍 Tela: Cancelar OBLPN\n📋 Ordem: [OBLPN]  [NOVA IBLPN] (Posição Fixa: ESTRP21204)";
     else if (modo === "Movimentar") texto = "📍 Tela: Movimentação LPN\n📋 Ordem: [LPN]  [POSIÇÃO]";
     else if (modo === "Retorno") texto = "📍 Tela: Retorno do Ativo\n📋 Ordem: [LPN]  [LOCAL]  [ITEM]  [QUANTIDADE]";
+    else if (modo === "Carga") texto = "📍 Tela: Carga Inicial\n📋 Ordem: [LPN]  [SKU]  [QTD]  [POSIÇÃO]";
     lblInstr.innerText = texto;
 }
 comboModo.addEventListener('change', atualizarInstrucoes);
 atualizarInstrucoes();
 
-// Função de Log
 function addLog(msg, tipo = "info") {
     let prefix = ">> ";
     if (tipo === "erro") prefix = "!! ";
@@ -91,56 +116,51 @@ function addLog(msg, tipo = "info") {
     const span = document.createElement('div');
     span.innerText = `${prefix}${msg}`;
 
-    // Cores adaptadas para o novo tema escuro do painel de logs
     if (tipo === "erro") {
-        span.style.color = "#f87171"; // Vermelho claro
+        span.style.color = "#f87171";
     } else if (tipo === "sucesso") {
-        span.style.color = "#4ade80"; // Verde vibrante
+        span.style.color = "#4ade80";
     } else {
-        span.style.color = "#38bdf8"; // Azul claro (padrão)
+        span.style.color = "#38bdf8";
     }
 
     logBox.appendChild(span);
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-// Abrir Navegador
 btnAbrir.addEventListener('click', () => {
-    addLog("Carregando WMS no painel ao lado...");
-    webview.src = WMS_URL;
+    addLog("Carregando WMS...");
+    webview.src = CURRENT_WMS_URL;
     btnAbrir.disabled = true;
 
-    // Quando a página carregar, envia comando para auto-login
     webview.addEventListener('did-finish-load', () => {
         const user = txtUser.value.trim();
         const pass = txtPass.value.trim();
 
         if (!user || !pass) {
-            addLog("Usuário ou senha não informados. Faça login manualmente.", "erro");
+            addLog("Login manual necessário.", "erro");
         } else {
-            addLog("Página carregada. Tentando login automático...");
+            addLog("Página carregada. Iniciando acesso automático...");
             webview.send('auto-login', { user, pass });
         }
         btnIniciar.disabled = false;
     }, { once: true });
 });
 
-// Parar Robô
 btnParar.addEventListener('click', () => {
     isRunning = false;
-    addLog("Parada solicitada. Aguardando fim do ciclo atual...", "erro");
+    addLog("Processamento interrompido pelo usuário.", "erro");
     btnParar.innerText = "Parando...";
 });
 
-// Iniciar Robô
 btnIniciar.addEventListener('click', async () => {
     const rawData = txtInput.value.trim();
-    if (!rawData) return alert("Cole os dados na caixa de texto!");
+    if (!rawData) return alert("Por favor, insira os dados para processamento.");
 
     const linhas = rawData.split('\n');
     const listaDados = linhas.map(l => l.split(/\s+/)).filter(l => l.length >= 2);
 
-    if (listaDados.length === 0) return alert("Formato de dados inválido.");
+    if (listaDados.length === 0) return alert("Nenhum dado válido encontrado.");
 
     isRunning = true;
     btnIniciar.disabled = true;
@@ -154,20 +174,16 @@ btnIniciar.addEventListener('click', async () => {
     let sucessos = 0, erros = 0;
     const modo = comboModo.value;
 
-    addLog(`Iniciando lote de ${listaDados.length} registros...`);
+    addLog(`Iniciando lote: ${listaDados.length} registros.`);
 
     for (let i = 0; i < listaDados.length; i++) {
-        if (!isRunning) {
-            addLog("Abortado pelo usuário.", "erro");
-            break;
-        }
+        if (!isRunning) break;
 
         const dados = listaDados[i];
-        addLog(`Processando linha ${i + 1}: ${dados[0]}...`);
+        addLog(`Item ${i + 1}: ${dados[0]}`);
 
         try {
-            // Envia o comando para o preload executar o JS no DOM do WMS
-            const resultado = await new Promise((resolve, reject) => {
+            await new Promise((resolve, reject) => {
                 const handler = (e) => {
                     if (e.channel === 'rotina-result') {
                         webview.removeEventListener('ipc-message', handler);
@@ -179,23 +195,22 @@ btnIniciar.addEventListener('click', async () => {
                 webview.send('run-rotina', { modo, dados });
             });
 
-            addLog(`[${i + 1}/${listaDados.length}] Sucesso: ${dados[0]}`, "sucesso");
+            addLog(`[${i + 1}/${listaDados.length}] Sucesso`, "sucesso");
             sucessos++;
 
         } catch (error) {
-            addLog(`[${i + 1}/${listaDados.length}] Erro em ${dados[0]}: ${error}`, "erro");
+            addLog(`[${i + 1}/${listaDados.length}] Falha: ${error}`, "erro");
             erros++;
-            // Tentativa de recuperação (Recarregar página ou atalho CTRL+E)
             webview.send('recover-error', modo);
-            await new Promise(r => setTimeout(r, 4000)); // Espera a recuperação
+            await new Promise(r => setTimeout(r, 4000));
         }
 
         progressBar.value = i + 1;
     }
 
     addLog("------------------------------");
-    addLog(`FIM: ${sucessos} Sucessos | ${erros} Erros`);
-    alert(`Processamento Finalizado!\nSucessos: ${sucessos}\nErros: ${erros}`);
+    addLog(`Concluído: ${sucessos} Sucessos | ${erros} Falhas`);
+    alert(`Processamento Concluído!\nSucessos: ${sucessos}\nFalhas: ${erros}`);
 
     isRunning = false;
     btnIniciar.disabled = false;
@@ -204,7 +219,6 @@ btnIniciar.addEventListener('click', async () => {
     txtInput.disabled = false;
 });
 
-// Escuta logs vindos de dentro do webview
 webview.addEventListener('ipc-message', (e) => {
     if (e.channel === 'webview-log') addLog(`[WMS] ${e.args[0]}`);
 });

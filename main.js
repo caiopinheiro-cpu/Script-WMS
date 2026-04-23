@@ -2,12 +2,12 @@ const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const { checkForUpdates, applyUpdate } = require('./updater');
 
-// ─── REFERÊNCIAS DE JANELAS ───────────────────────────────────────────────────
+// Janelas
 let splashWindow = null;
 let updateWindow = null;
 let mainWindow   = null;
 
-// ─── SPLASH SCREEN ────────────────────────────────────────────────────────────
+// Splash Screen
 function createSplashWindow() {
     splashWindow = new BrowserWindow({
         width: 520,
@@ -27,7 +27,7 @@ function createSplashWindow() {
     splashWindow.setSkipTaskbar(true);
 }
 
-// ─── TELA DE ATUALIZAÇÃO ──────────────────────────────────────────────────────
+// Tela de Atualização
 function createUpdateWindow(localVersion, remoteVersion) {
     updateWindow = new BrowserWindow({
         width: 580,
@@ -55,7 +55,7 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
-        title: 'Arco WMS Automator',
+        title: 'Arco WMS Assistant',
         autoHideMenuBar: true,
         show: false,   // só mostra depois que carregar
         webPreferences: {
@@ -136,7 +136,7 @@ async function bootstrap() {
     }
 }
 
-// ─── ABRE O APP PRINCIPAL E FECHA A SPLASH ────────────────────────────────────
+// Inicialização do App
 async function openMainApp() {
     try {
         await session.defaultSession.clearStorageData({
@@ -165,7 +165,7 @@ async function openMainApp() {
     });
 }
 
-// ─── IPC: BOTÃO "ATUALIZAR AGORA" ────────────────────────────────────────────
+// Eventos IPC
 ipcMain.on('start-update', async () => {
     const appPath = app.getAppPath();
 

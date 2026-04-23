@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Arco WMS Automator</title>
+    <title>Arco WMS Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -281,8 +281,8 @@
         </div>
 
         <!-- Título -->
-        <h1 class="app-title">ARCO <span>WMS</span> AUTOMATOR</h1>
-        <p class="app-subtitle">Logística Centralizada em Um Só Lugar</p>
+        <h1 class="app-title">ARCO <span>WMS</span> ASSISTANT</h1>
+        <p class="app-subtitle">Logística Inteligente e Centralizada</p>
 
         <!-- Status -->
         <div class="status-container">
@@ -313,7 +313,7 @@
     <script>
         const { ipcRenderer } = require('electron');
 
-        // ── Partículas ──────────────────────────────────────────────────────
+        // Efeito de Partículas
         const particlesEl = document.getElementById('particles');
         for (let i = 0; i < 18; i++) {
             const p = document.createElement('div');
@@ -354,7 +354,7 @@
             statusIcon.innerHTML = `<i class="${iconClass}"></i>`;
         }
 
-        // ── Eventos do Main Process ──────────────────────────────────────────
+        // Inicialização de Status
         ipcRenderer.on('splash-status', (event, data) => {
             const { type, text, subtext, progress, version } = data;
 
@@ -364,7 +364,7 @@
             if (version) versionBadge.textContent = `v${version}`;
 
             if (type === 'checking') {
-                setProgress(-1); // indeterminate
+                setProgress(-1);
             } else if (type === 'success') {
                 showIcon('success', 'fa-solid fa-check');
             } else if (type === 'error') {

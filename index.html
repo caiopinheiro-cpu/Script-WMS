@@ -93,7 +93,7 @@
             z-index: 10;
         }
 
-        /* Painel Direito (Webview) */
+        /* Painel Direito (WMS) */
         #right-panel {
             flex: 1;
             display: flex;
@@ -110,7 +110,7 @@
         }
 
         #right-panel::before {
-            content: "VISUALIZADOR WMS";
+            content: "SISTEMA WMS";
             position: absolute;
             top: 50%;
             left: 50%;
@@ -461,7 +461,6 @@
 
 <body>
     <div id="app-container">
-        <!-- Painel Esquerdo -->
         <div id="left-panel">
             <div class="header">
                 <div
@@ -469,10 +468,18 @@
                     <img src="https://companieslogo.com/img/orig/ARCE_BIG-78923d29.png?t=1720244490" alt="Arco Educação"
                         style="height: 28px; display: block;">
                 </div>
-                <h1><i class="fa-solid fa-robot"></i> ARCO WMS AUTOMATOR</h1>
+                <h1><i class="fa-solid fa-wand-magic-sparkles"></i> ARCO WMS ASSISTANT</h1>
             </div>
 
             <div class="controls">
+                <div class="control-group">
+                    <label><i class="fa-solid fa-server"></i> Seleção do WMS:</label>
+                    <div class="wms-selector" style="display: flex; gap: 10px; background: rgba(0,0,0,0.05); padding: 5px; border-radius: var(--radius-lg);">
+                        <button id="btn-wms-sae" class="wms-type-btn active" style="flex: 1; padding: 10px; border-radius: 8px; box-shadow: none; font-size: 12px; background: var(--azul-arco);">SAE (PROD)</button>
+                        <button id="btn-wms-sas" class="wms-type-btn" style="flex: 1; padding: 10px; border-radius: 8px; box-shadow: none; font-size: 12px; background: transparent; color: var(--text-main);">SAS (TEST)</button>
+                    </div>
+                </div>
+
                 <div class="control-group"
                     style="display: flex; flex-direction: row; gap: 10px; align-items: flex-end;">
                     <div style="flex: 1;">
@@ -490,13 +497,14 @@
                 </div>
 
                 <div class="control-group">
-                    <label for="combo-modo"><i class="fa-solid fa-gears"></i> Robô / Operação:</label>
+                    <label for="combo-modo"><i class="fa-solid fa-sliders"></i> Tipo de Automação:</label>
                     <select id="combo-modo">
                         <option value="Fracionamento">1. Fracionamento (Split)</option>
                         <option value="Recebimento">2. Recebimento (Conferência)</option>
                         <option value="Cancelamento">3. Cancelamento Fixo</option>
                         <option value="Movimentar">4. Movimentar LPN</option>
                         <option value="Retorno">5. Retorno do Ativo</option>
+                        <option value="Carga">6. Carga Inicial</option>
                     </select>
                 </div>
 
@@ -508,8 +516,8 @@
                 </div>
 
                 <div class="btn-group">
-                    <button id="btn-abrir" class="btn-full"><i class="fa-solid fa-globe"></i> ABRIR WMS</button>
-                    <button id="btn-iniciar" disabled><i class="fa-solid fa-play"></i> EXECUTAR ROBÔ</button>
+                    <button id="btn-abrir" class="btn-full"><i class="fa-solid fa-globe"></i> CONECTAR AO WMS</button>
+                    <button id="btn-iniciar" disabled><i class="fa-solid fa-play"></i> INICIAR TAREFAS</button>
                     <button id="btn-parar" disabled><i class="fa-solid fa-stop"></i> PARAR</button>
                 </div>
 

@@ -2,7 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-// ─── CONFIGURAÇÕES DO GITHUB ─────────────────────────────────────────────────
+// Configurações do GitHub
 // O token é lido de config.json para não ficar exposto no código-fonte.
 function loadConfig() {
     try {
@@ -26,7 +26,7 @@ const FILES_TO_UPDATE = [
     'preload.js'
 ];
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
+// Funções Auxiliares
 
 /**
  * Faz uma requisição HTTPS genérica e retorna uma Promise com os dados.
@@ -35,7 +35,7 @@ function httpsGet(url, headers = {}) {
     return new Promise((resolve, reject) => {
         const options = {
             headers: {
-                'User-Agent': 'ArcoWMSAutomator',
+                'User-Agent': 'ArcoWMSAssistant',
                 'Authorization': `token ${GITHUB_TOKEN}`,
                 ...headers
             }
@@ -135,7 +135,7 @@ async function downloadFile(fileName, destPath) {
     return new Promise((resolve, reject) => {
         const options = {
             headers: {
-                'User-Agent': 'ArcoWMSAutomator',
+                'User-Agent': 'ArcoWMSAssistant',
                 'Authorization': `token ${GITHUB_TOKEN}`
             }
         };
@@ -163,7 +163,7 @@ async function downloadFile(fileName, destPath) {
     });
 }
 
-// ─── FUNÇÃO PRINCIPAL ─────────────────────────────────────────────────────────
+// Lógica de Atualização
 
 /**
  * Verifica se há atualizações disponíveis no GitHub.
