@@ -48,13 +48,15 @@ function httpsGet(url, headers = {}) {
             }
 
             if (res.statusCode !== 200) {
-                return reject(new Error(`HTTP ${res.statusCode} ao acessar: ${url}`));
+                return reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage} em ${url}`));
             }
 
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => resolve(data));
-        }).on('error', reject);
+        }).on('error', (err) => {
+            reject(new Error(`Falha na rede: ${err.message}`));
+        });
     });
 }
 
@@ -121,7 +123,7 @@ async function fetchLatestRelease() {
             sha: json.sha
         };
     } catch (e) {
-        console.error('[Updater] Erro ao buscar versão remota:', e.message);
+        console.error('[Updater] Falha na busca remota:', e.message);
         return null;
     }
 }
