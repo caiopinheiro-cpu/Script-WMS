@@ -103,6 +103,7 @@ function atualizarInstrucoes() {
     else if (modo === "Movimentar") texto = "📍 Tela: Movimentação LPN\n📋 Ordem: [LPN]  [POSIÇÃO]";
     else if (modo === "Retorno") texto = "📍 Tela: Retorno do Ativo\n📋 Ordem: [LPN]  [LOCAL]  [ITEM]  [QUANTIDADE]";
     else if (modo === "Carga") texto = "📍 Tela: Carga Inicial\n📋 Ordem: [LPN]  [SKU]  [QTD]  [POSIÇÃO]";
+    else if (modo === "FracionamentoLPN") texto = "📍 Tela: Fracionamento/LPN\n📋 Ordem: [LPN]  [QTD]  [LPN NOVA]";
     lblInstr.innerText = texto;
 }
 comboModo.addEventListener('change', atualizarInstrucoes);

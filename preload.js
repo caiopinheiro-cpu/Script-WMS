@@ -61,6 +61,25 @@ async function simularCtrlE() {
     el.dispatchEvent(new KeyboardEvent('keyup', eventData));
 }
 
+async function simularF2() {
+    const el = document.activeElement || document.body || document;
+    ipcRenderer.sendToHost('webview-log', 'Acionando comando F2...');
+    
+    const eventData = { 
+        key: 'F2', 
+        keyCode: 113, 
+        which: 113, 
+        code: 'F2', 
+        bubbles: true,
+        cancelable: true,
+        view: window
+    };
+
+    el.dispatchEvent(new KeyboardEvent('keydown', eventData));
+    await sleep(50);
+    el.dispatchEvent(new KeyboardEvent('keyup', eventData));
+}
+
 // --- Rotinas de Automação ---
 
 async function login(user, pass) {
@@ -213,6 +232,40 @@ async function rotinaCargaInicial(dados) {
     await sleep(800);
 }
 
+async function rotinaFracionamentoLPN(dados) {
+    const [lpn, qtd, lpnNova] = dados;
+
+    // 1. Inserir LPN de Origem (Usa o seletor genérico de barcode)
+    let campoLpn = await waitForElement(SELECTOR_INPUT_BARCODE);
+    await sendKeys(campoLpn, lpn, 'ENTER');
+    await sleep(1200);
+
+    // 2. Inserir Quantidade (Usa o seletor genérico de número)
+    let campoQtd = await waitForElement(SELECTOR_INPUT_NUMBER);
+    await sendKeys(campoQtd, qtd, 'TAB');
+    await sleep(1200);
+
+    // 3. Inserir LPN Nova (Geralmente o campo que ganha foco ou o último campo de barcode que aparece)
+    let campoLpnNova = document.activeElement;
+    // Se o elemento focado não for um input de barcode, tentamos buscar o último disponível na página
+    if (!campoLpnNova || !campoLpnNova.id.includes('barcode-fld')) {
+        campoLpnNova = await waitForElement("(//input[contains(@id, 'barcode-fld|input')])[last()]");
+    }
+    await sendKeys(campoLpnNova, lpnNova, 'ENTER');
+    await sleep(1500);
+
+    // 4. Confirmar Criação da LPN (Clicar em OK - Seletor dinâmico para o botão de confirmação)
+    let btnOk = await waitForElement("//span[contains(@id, 'btn-yesno') and contains(@class, 'oj-button-text') and text()='OK']");
+    if (!btnOk) btnOk = await waitForElement(SELECTOR_BTN_OK);
+    
+    btnOk.click();
+    await sleep(1500);
+
+    // 5. Apertar F2 para retornar e reiniciar o ciclo
+    await simularF2();
+    await sleep(1500);
+}
+
 // IPC Handlers
 ipcRenderer.on('auto-login', async (event, args) => {
     const { user, pass } = args;
@@ -236,6 +289,7 @@ ipcRenderer.on('run-rotina', async (event, args) => {
         else if (modo === "Movimentar") await rotinaMovimentar(dados);
         else if (modo === "Retorno") await rotinaRetornoAtivo(dados);
         else if (modo === "Carga") await rotinaCargaInicial(dados);
+        else if (modo === "FracionamentoLPN") await rotinaFracionamentoLPN(dados);
 
         ipcRenderer.sendToHost('rotina-result', { success: true });
     } catch (e) {

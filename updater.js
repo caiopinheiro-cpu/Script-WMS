@@ -13,10 +13,10 @@ function loadConfig() {
     }
 }
 
-const _cfg          = loadConfig();
-const GITHUB_TOKEN  = _cfg.github_token;
-const GITHUB_OWNER  = _cfg.github_owner  || 'caiopinheiro-cpu';
-const GITHUB_REPO   = _cfg.github_repo   || 'Script-WMS';
+const _cfg = loadConfig();
+const GITHUB_TOKEN = _cfg.github_token;
+const GITHUB_OWNER = _cfg.github_owner || 'caiopinheiro-cpu';
+const GITHUB_REPO = _cfg.github_repo || 'Script-WMS';
 const GITHUB_BRANCH = _cfg.github_branch || 'main';
 
 // Arquivos que serão verificados e atualizados automaticamente
@@ -133,7 +133,7 @@ async function fetchLatestRelease() {
  */
 async function downloadFile(fileName, destPath) {
     const rawUrl = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${fileName}`;
-    
+
     return new Promise((resolve, reject) => {
         const options = {
             headers: {
