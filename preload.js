@@ -44,13 +44,13 @@ async function sendKeys(el, text, action = null) {
 async function simularCtrlE() {
     const el = document.activeElement || document.body || document;
     ipcRenderer.sendToHost('webview-log', 'Acionando comando CTRL+E...');
-    
-    const eventData = { 
-        key: 'e', 
-        keyCode: 69, 
-        which: 69, 
-        code: 'KeyE', 
-        ctrlKey: true, 
+
+    const eventData = {
+        key: 'e',
+        keyCode: 69,
+        which: 69,
+        code: 'KeyE',
+        ctrlKey: true,
         bubbles: true,
         cancelable: true,
         view: window
@@ -64,12 +64,12 @@ async function simularCtrlE() {
 async function simularF2() {
     const el = document.activeElement || document.body || document;
     ipcRenderer.sendToHost('webview-log', 'Acionando comando F2...');
-    
-    const eventData = { 
-        key: 'F2', 
-        keyCode: 113, 
-        which: 113, 
-        code: 'F2', 
+
+    const eventData = {
+        key: 'F2',
+        keyCode: 113,
+        which: 113,
+        code: 'F2',
         bubbles: true,
         cancelable: true,
         view: window
@@ -158,13 +158,70 @@ async function rotinaCancelamento(dados) {
     let campoIblpn = await waitForElement(SELECTOR_INPUT_BARCODE);
     await sendKeys(campoIblpn, iblpn, 'ENTER');
 
-    let btnOk = await waitForElement(SELECTOR_BTN_OK);
-    btnOk.click();
-    await sleep(1000);
+    // 1. Aguarda um momento para ver se o popup de posição já abre automaticamente com o ENTER do IBLPN
+    let campoPos = null;
+    let start = Date.now();
+    let timeout = 1500; // 1.5 segundos de verificação rápida
+    while (Date.now() - start < timeout) {
+        const inputs = document.evaluate(
+            "//input[contains(@id, 'barcode-fld|input')]",
+            document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null
+        );
+        for (let i = 0; i < inputs.snapshotLength; i++) {
+            const el = inputs.snapshotItem(i);
+            if (el && el.offsetParent !== null && !el.disabled && el !== campoOblpn && el !== campoIblpn) {
+                campoPos = el;
+                break;
+            }
+        }
+        if (campoPos) break;
+        await sleep(100);
+    }
 
-    let campoPos = await waitForElement(SELECTOR_INPUT_BARCODE);
+    // 2. Se o popup NÃO abriu automaticamente com o ENTER, clicamos no botão OK da tela principal
+    if (!campoPos) {
+        ipcRenderer.sendToHost('webview-log', 'Popup não abriu automaticamente. Clicando no botão OK da tela principal...');
+        const xpathBtnOkPrincipal = "//span[(text()='OK' or text()='OK ' or contains(@id, '|text')) and not(contains(@id, 'ctrl-a-btn-barcode-type'))]";
+        let btnOk = await waitForElement(xpathBtnOkPrincipal);
+        btnOk.click();
+
+        // Aguarda o aparecimento do novo campo de posição no popup (com timeout maior de 10 segundos)
+        start = Date.now();
+        timeout = 10000;
+        while (Date.now() - start < timeout) {
+            const inputs = document.evaluate(
+                "//input[contains(@id, 'barcode-fld|input')]",
+                document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null
+            );
+            for (let i = 0; i < inputs.snapshotLength; i++) {
+                const el = inputs.snapshotItem(i);
+                if (el && el.offsetParent !== null && !el.disabled && el !== campoOblpn && el !== campoIblpn) {
+                    campoPos = el;
+                    break;
+                }
+            }
+            if (campoPos) break;
+            await sleep(200);
+        }
+    }
+
+    if (!campoPos) {
+        throw new Error("Tempo esgotado aguardando o campo de posição fixa no popup.");
+    }
+
+    // 3. Aguarda até que o campo saia do estado de inicialização do Oracle JET (a classe 'oj-component-initnode' deve sumir)
+    const initStart = Date.now();
+    while (campoPos.classList.contains('oj-component-initnode') && (Date.now() - initStart < 5000)) {
+        await sleep(100);
+    }
+
+    // 4. Foca no campo e dá tempo de garantia
+    campoPos.focus();
+    await sleep(150);
+
+    // 5. Insere a posição fixa e confirma com ENTER
     await sendKeys(campoPos, POSICAO_PADRAO_CANCELAMENTO, 'ENTER');
-    await sleep(1500);
+    await sleep(1000);
 }
 
 async function rotinaMovimentar(dados) {
@@ -257,7 +314,7 @@ async function rotinaFracionamentoLPN(dados) {
     // 4. Confirmar Criação da LPN (Clicar em OK - Seletor dinâmico para o botão de confirmação)
     let btnOk = await waitForElement("//span[contains(@id, 'btn-yesno') and contains(@class, 'oj-button-text') and text()='OK']");
     if (!btnOk) btnOk = await waitForElement(SELECTOR_BTN_OK);
-    
+
     btnOk.click();
     await sleep(1500);
 
