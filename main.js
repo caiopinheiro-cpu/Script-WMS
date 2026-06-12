@@ -61,7 +61,8 @@ function createMainWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            webviewTag: true
+            webviewTag: true,
+            backgroundThrottling: false
         }
     });
 
